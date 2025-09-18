@@ -109,7 +109,9 @@ export default function Sites() {
               value={expandedSites}
               onValueChange={(v) => setExpandedSites(v as string[])}
             >
-              {sites.map((site) => {
+              {sites
+                .filter((site) => site.name.toLowerCase().includes(query.toLowerCase()))
+                .map((site) => {
                 const incharge = siteIncharges.find(
                   (u) => u.id === site.inchargeId,
                 );
@@ -125,42 +127,26 @@ export default function Sites() {
                       </div>
                     </AccordionTrigger>
                     <AccordionContent>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="md:col-span-1 border rounded-md p-3">
-                          <div className="text-sm text-gray-500">
-                            Site Incharge
-                          </div>
-                          <div className="font-medium">
-                            {incharge?.name || "Not Assigned"}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {incharge?.username || "-"}
-                          </div>
+                      <div className="border rounded-md">
+                        <div className="grid grid-cols-12 gap-2 p-3 text-sm text-gray-600 bg-muted/30">
+                          <div className="col-span-4">Site Foremen</div>
+                          <div className="col-span-8 text-right"></div>
                         </div>
-                        <div className="md:col-span-2 space-y-2">
+                        <div className="p-3 space-y-2">
                           {siteForemen.length === 0 ? (
-                            <div className="text-gray-500">
-                              No foremen assigned.
-                            </div>
+                            <div className="text-gray-500">No foremen assigned.</div>
                           ) : (
                             siteForemen.map((f) => (
-                              <div key={f.id} className="border rounded-md">
-                                <button
-                                  className="w-full text-left px-3 py-2 hover:bg-muted"
-                                  onClick={() => openForemanDialog(f.id)}
-                                >
-                                  <div className="flex items-center justify-between">
-                                    <div>
-                                      <div className="font-medium">
-                                        {f.name}
-                                      </div>
-                                      <div className="text-xs text-gray-500">
-                                        @{f.username}
-                                      </div>
-                                    </div>
-                                    <div className="text-xs text-gray-500">View attendance</div>
-                                  </div>
-                                </button>
+                              <div key={f.id} className="grid grid-cols-12 items-center gap-2">
+                                <div className="col-span-10 flex items-center gap-2">
+                                  <div className="h-6 w-6 rounded-sm bg-gray-100 flex items-center justify-center text-xs">{f.name.charAt(0)}</div>
+                                  <span className="font-medium">{f.name}</span>
+                                </div>
+                                <div className="col-span-2 text-right">
+                                  <a className="inline-block" href={`/attendance/records?foremanId=${f.id}&name=${encodeURIComponent(f.name)}`}>
+                                    <button className="h-8 px-3 rounded-md bg-primary text-primary-foreground text-sm">View</button>
+                                  </a>
+                                </div>
                               </div>
                             ))
                           )}
@@ -175,40 +161,7 @@ export default function Sites() {
         </CardContent>
       </Card>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Foreman Attendance</DialogTitle>
-          </DialogHeader>
-          {selectedForemanId ? (
-            loadingForeman[selectedForemanId] ? (
-              <div className="text-sm text-gray-500">Loading...</div>
-            ) : (
-              <div className="space-y-3">
-                {(() => {
-                  const records = (foremanRecords[selectedForemanId] || []).slice();
-                  if (records.length === 0) {
-                    return <div className="text-sm text-gray-500">No attendance records.</div>;
-                  }
-                  records.sort((a, b) => (a.date < b.date ? 1 : -1));
-                  const latest = records[0];
-                  return (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between border rounded p-2">
-                        <div>
-                          <div className="font-medium">{latest.date}</div>
-                          <div className="text-xs text-gray-500">{latest.presentWorkers}/{latest.totalWorkers} present</div>
-                        </div>
-                        <Badge variant={statusVariant(latest.status)}>{statusLabel(latest.status)}</Badge>
-                      </div>
-                    </div>
-                  );
-                })()}
-              </div>
-            )
-          ) : null}
-        </DialogContent>
-      </Dialog>
+      <div className="text-sm text-gray-600">Showing {sites.length} sites</div>
     </div>
   );
 }
