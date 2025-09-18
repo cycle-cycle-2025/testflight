@@ -223,3 +223,88 @@ export const handleListSites: RequestHandler = (_req, res) => {
     return res.status(500).json(response);
   }
 };
+
+export const handleUpdateSite: RequestHandler = (req, res) => {
+  try {
+    const admin = getUserFromToken(req.headers.authorization);
+    if (!admin || admin.role !== "admin") {
+      const response: ApiResponse = { success: false, message: "Unauthorized" };
+      return res.status(401).json(response);
+    }
+    const { id } = req.params as { id: string };
+    const site = database.sites.find((s) => s.id === id);
+    if (!site) {
+      const response: ApiResponse = { success: false, message: "Site not found" };
+      return res.status(404).json(response);
+    }
+
+    const { name, location, inchargeId, foremanIds } = req.body as Partial<Site> & { foremanIds?: string[] };
+
+    if (typeof name === "string") site.name = name;
+    if (typeof location === "string") site.location = location;
+
+    if (typeof inchargeId === "string") {
+      if (site.inchargeId && site.inchargeId !== inchargeId) {
+        const prev = database.users.find((u) => u.id === site.inchargeId);
+        if (prev) prev.siteId = "";
+      }
+      const newIncharge = database.users.find((u) => u.id === inchargeId);
+      if (!inchargeId) {
+        site.inchargeId = "";
+        site.inchargeName = "";
+      } else if (newIncharge && newIncharge.role === "site_incharge") {
+        site.inchargeId = newIncharge.id;
+        site.inchargeName = newIncharge.name;
+        newIncharge.siteId = site.id;
+      }
+    }
+
+    if (Array.isArray(foremanIds)) {
+      database.users
+        .filter((u) => u.role === "foreman")
+        .forEach((u) => {
+          if (foremanIds.includes(u.id)) {
+            u.siteId = site.id;
+          } else if (u.siteId === site.id) {
+            u.siteId = "";
+          }
+        });
+    }
+
+    const response: ApiResponse<Site> = { success: true, data: site };
+    return res.json(response);
+  } catch (error) {
+    console.error("Update site error:", error);
+    const response: ApiResponse = { success: false, message: "Internal server error" };
+    return res.status(500).json(response);
+  }
+};
+
+export const handleDeleteSite: RequestHandler = (req, res) => {
+  try {
+    const admin = getUserFromToken(req.headers.authorization);
+    if (!admin || admin.role !== "admin") {
+      const response: ApiResponse = { success: false, message: "Unauthorized" };
+      return res.status(401).json(response);
+    }
+    const { id } = req.params as { id: string };
+    const idx = database.sites.findIndex((s) => s.id === id);
+    if (idx === -1) {
+      const response: ApiResponse = { success: false, message: "Site not found" };
+      return res.status(404).json(response);
+    }
+    database.users.forEach((u) => {
+      if (u.siteId === id) u.siteId = "";
+    });
+    database.workers.forEach((w) => {
+      if (w.siteId === id) (w as any).siteId = "";
+    });
+    database.sites.splice(idx, 1);
+    const response: ApiResponse = { success: true };
+    return res.json(response);
+  } catch (error) {
+    console.error("Delete site error:", error);
+    const response: ApiResponse = { success: false, message: "Internal server error" };
+    return res.status(500).json(response);
+  }
+};
