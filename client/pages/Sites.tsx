@@ -80,17 +80,24 @@ export default function Sites() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Sites</h1>
-        <p className="text-gray-600">
-          Browse sites and view attendance per foreman
-        </p>
+        <h1 className="text-2xl font-bold text-gray-900">Attendance</h1>
+        <p className="text-gray-600">Browse sites and view attendance per foreman</p>
+      </div>
+
+      <div className="max-w-md">
+        <input
+          placeholder="Search sites..."
+          className="border rounded-md h-10 px-3 w-full"
+          value={query}
+          onChange={(e)=>setQuery(e.target.value)}
+        />
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Sites</CardTitle>
+          <CardTitle>Attendance</CardTitle>
           <CardDescription>
-            Site → Incharge (left) and Foremen (right)
+            Tap a site to expand and view foremen; click a foreman to view attendance
           </CardDescription>
         </CardHeader>
         <CardContent>
