@@ -13,9 +13,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "../components/ui/accordion";
-import { ApiResponse, Site, User, AttendanceRecord } from "@shared/api";
-import { Badge } from "../components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
+import { ApiResponse, Site, User } from "@shared/api";
 
 export default function Sites() {
   const { user } = useAuth();
