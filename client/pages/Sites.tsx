@@ -89,11 +89,18 @@ export default function Sites() {
           {sites.length === 0 ? (
             <div className="text-gray-500">No sites found.</div>
           ) : (
-            <Accordion
-              type="multiple"
-              value={expandedSites}
-              onValueChange={(v) => setExpandedSites(v as string[])}
-            >
+            <>
+              <div className="grid grid-cols-12 gap-2 p-3 text-sm text-gray-600 bg-muted/50 rounded-t-md">
+                <div className="col-span-3">Site Incharge</div>
+                <div className="col-span-3">Name</div>
+                <div className="col-span-4">Location</div>
+                <div className="col-span-2">Total Foremen</div>
+              </div>
+              <Accordion
+                type="multiple"
+                value={expandedSites}
+                onValueChange={(v) => setExpandedSites(v as string[])}
+              >
               {sites
                 .filter((site) => site.name.toLowerCase().includes(query.toLowerCase()))
                 .map((site) => {
@@ -104,11 +111,13 @@ export default function Sites() {
                 return (
                   <AccordionItem key={site.id} value={site.id}>
                     <AccordionTrigger>
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{site.name}</span>
-                        <span className="text-sm text-gray-500">
-                          ({site.location})
-                        </span>
+                      <div className="grid grid-cols-12 gap-2 w-full text-left">
+                        <div className="col-span-3 flex items-center gap-2">
+                          <span className="font-medium">{incharge?.name || '-'}</span>
+                        </div>
+                        <div className="col-span-3 font-medium">{site.name}</div>
+                        <div className="col-span-4 text-gray-600">{site.location}</div>
+                        <div className="col-span-2">{siteForemen.length}</div>
                       </div>
                     </AccordionTrigger>
                     <AccordionContent>
@@ -142,6 +151,7 @@ export default function Sites() {
                 );
               })}
             </Accordion>
+            </>
           )}
         </CardContent>
       </Card>
