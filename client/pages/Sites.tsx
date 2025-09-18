@@ -61,19 +61,6 @@ export default function Sites() {
     );
   }
 
-  const statusLabel = (s: AttendanceRecord["status"]) => {
-    if (s === "incharge_reviewed") return "Approved by Incharge";
-    if (s === "submitted") return "Taken (Pending Review)";
-    if (s === "admin_approved") return "Admin Approved";
-    return "Rejected";
-  };
-
-  const statusVariant = (s: AttendanceRecord["status"]) => {
-    if (s === "incharge_reviewed") return "default" as const;
-    if (s === "submitted") return "secondary" as const;
-    if (s === "admin_approved") return "outline" as const;
-    return "destructive" as const;
-  };
 
   return (
     <div className="space-y-6">
