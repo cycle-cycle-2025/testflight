@@ -93,6 +93,10 @@ export function createServer() {
   app.put("/api/workers/:id", handleUpdateWorker);
   app.delete("/api/workers/:id", handleDeleteWorker);
 
+  // Sites
+  app.put("/api/sites/:id", handleUpdateSite);
+  app.delete("/api/sites/:id", handleDeleteSite);
+
   return app;
 }
 
