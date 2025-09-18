@@ -112,13 +112,13 @@ export default function Layout({ children }: LayoutProps) {
           roles: ["admin"],
         },
         {
-          label: "Sites",
-          href: "/sites/overview",
+          label: "Attendance",
+          href: "/attendance",
           icon: Building2,
           roles: ["admin"],
         },
         {
-          label: "Attendance Records (coming soon)",
+          label: "Attendance Records",
           href: "/attendance/records",
           icon: ClipboardList,
           roles: ["admin"],
