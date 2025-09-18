@@ -57,30 +57,11 @@ export default function Sites() {
   if (!isAdmin) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold text-gray-900">Sites</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Attendance</h1>
         <p className="text-gray-600">Only admins can view this page.</p>
       </div>
     );
   }
-
-  const openForemanDialog = async (foremanId: string) => {
-    setSelectedForemanId(foremanId);
-    setDialogOpen(true);
-    if (!foremanRecords[foremanId]) {
-      try {
-        setLoadingForeman((prev) => ({ ...prev, [foremanId]: true }));
-        const token = localStorage.getItem("auth_token");
-        const res = await fetch(`/api/attendance/foreman/${foremanId}`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        const data: ApiResponse<AttendanceRecord[]> = await res.json();
-        if (data.success && data.data)
-          setForemanRecords((prev) => ({ ...prev, [foremanId]: data.data! }));
-      } finally {
-        setLoadingForeman((prev) => ({ ...prev, [foremanId]: false }));
-      }
-    }
-  };
 
   const statusLabel = (s: AttendanceRecord["status"]) => {
     if (s === "incharge_reviewed") return "Approved by Incharge";
