@@ -24,15 +24,7 @@ export default function Sites() {
   const [users, setUsers] = useState<User[]>([]);
   const [sites, setSites] = useState<Site[]>([]);
   const [expandedSites, setExpandedSites] = useState<string[]>([]);
-  const [expandedForemen, setExpandedForemen] = useState<Record<string, boolean>>({});
-  const [selectedForemanId, setSelectedForemanId] = useState<string | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [foremanRecords, setForemanRecords] = useState<
-    Record<string, AttendanceRecord[]>
-  >({});
-  const [loadingForeman, setLoadingForeman] = useState<Record<string, boolean>>(
-    {},
-  );
+  const [query, setQuery] = useState("");
 
   const siteIncharges = useMemo(
     () => users.filter((u) => u.role === "site_incharge"),
