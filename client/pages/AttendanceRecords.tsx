@@ -51,7 +51,20 @@ export default function AttendanceRecords() {
       });
       const data: ApiResponse<AttendanceRecord[]> = await res.json();
       if (data.success && data.data) {
-        const filtered = data.data.filter((r) => r.date.split("T")[0] === selectedDate);
+        const now = new Date();
+        const startAnchor = new Date();
+        startAnchor.setHours(5, 30, 0, 0);
+        let windowStart = new Date(startAnchor);
+        if (now < startAnchor) {
+          windowStart = new Date(startAnchor.getTime() - 24 * 60 * 60 * 1000);
+        }
+        const filtered = data.data
+          .filter(r => r.status === 'admin_approved')
+          .filter(r => {
+            const approvedAt = r.approvedAt ? new Date(r.approvedAt) : new Date(r.date);
+            return approvedAt < windowStart;
+          })
+          .filter((r) => r.date.split("T")[0] === selectedDate);
         setRecords(filtered);
       } else {
         setRecords([]);
