@@ -49,10 +49,11 @@ export default function AttendanceSubmission() {
   const didFetchRef = useRef(false);
   useEffect(() => {
     if (didFetchRef.current) return;
+    if (!user?.siteId || !localStorage.getItem("auth_token")) return;
     didFetchRef.current = true;
     fetchWorkers();
     checkSubmissionForDate(selectedDate);
-  }, []);
+  }, [user?.siteId]);
 
   const fetchWorkers = async () => {
     try {
@@ -158,7 +159,7 @@ export default function AttendanceSubmission() {
       const draftKey = getDraftKey(new Date(selectedDate));
       const stored = localStorage.getItem(draftKey);
       if (!stored) {
-        toast({ title: "ड्राफ्ट नहीं मिला", description: "इस तारीख के लिए कोई सेव ड्राफ्ट उ���लब्ध नहीं है" });
+        toast({ title: "ड्राफ्ट नहीं मिला", description: "इस तारीख के लिए कोई सेव ड्राफ्ट उपलब्ध नहीं है" });
         return;
       }
       const parsed: EntryWithFormula[] = JSON.parse(stored);
