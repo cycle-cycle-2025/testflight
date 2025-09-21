@@ -21,6 +21,8 @@ export default function AttendanceRecords() {
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split("T")[0]);
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
   const [loading, setLoading] = useState(false);
+  const [viewOpen, setViewOpen] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<AttendanceRecord | null>(null);
 
   useEffect(() => {
     if (!isAdmin) return;
