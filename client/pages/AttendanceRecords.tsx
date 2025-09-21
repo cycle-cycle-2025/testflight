@@ -128,13 +128,17 @@ export default function AttendanceRecords() {
           ) : (
             <div className="space-y-3">
               {records.map((rec) => (
-                <div key={rec.id} className="border rounded-md p-3 flex items-center justify-between">
+                <button
+                  key={rec.id}
+                  className="w-full border rounded-md p-3 flex items-center justify-between hover:bg-muted/50 text-left"
+                  onClick={() => { setSelectedRecord(rec); setViewOpen(true); }}
+                >
                   <div>
                     <div className="font-medium">{new Date(rec.date).toLocaleDateString()}</div>
                     <div className="text-sm text-gray-600">{rec.presentWorkers}/{rec.totalWorkers} present • {rec.siteName}</div>
                   </div>
                   <div className="text-sm text-gray-600">{selectedForemanName}</div>
-                </div>
+                </button>
               ))}
             </div>
           )}
