@@ -137,8 +137,8 @@ export default function Sites() {
                                   <span className="font-medium">{f.name}</span>
                                 </div>
                                 <div className="col-span-2 text-right">
-                                  <a className="inline-block" href={`/attendance/records?foremanId=${f.id}&name=${encodeURIComponent(f.name)}`}>
-                                    <button className="h-8 px-3 rounded-md bg-primary text-primary-foreground text-sm">View</button>
+                                  <a className="inline-block h-8 px-3 rounded-md bg-primary text-primary-foreground text-sm flex items-center justify-center" href={`/attendance/records?foremanId=${f.id}&name=${encodeURIComponent(f.name)}`}>
+                                    View
                                   </a>
                                 </div>
                               </div>
