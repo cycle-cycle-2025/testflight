@@ -169,15 +169,6 @@ export default function SiteManagement() {
           <p className="text-gray-600">Manage your construction site locations and assigned foremen</p>
         </div>
         <div className="flex items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline"><Plus className="h-4 w-4 mr-2"/> Add</Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => (window.location.href = "/users/add?role=site_incharge")}>Add Site Incharge</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => (window.location.href = "/users/add?role=foreman")}>Add Foreman</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
           <Button onClick={beginCreate}><Plus className="h-4 w-4 mr-2"/> Add Site</Button>
         </div>
       </div>
