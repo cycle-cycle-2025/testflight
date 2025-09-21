@@ -26,6 +26,10 @@ export default function Sites() {
   const [sites, setSites] = useState<Site[]>([]);
   const [expandedSites, setExpandedSites] = useState<string[]>([]);
   const [query, setQuery] = useState("");
+  const [viewOpen, setViewOpen] = useState(false);
+  const [viewLoading, setViewLoading] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<import("@shared/api").AttendanceRecord | null>(null);
+  const [selectedForemanName, setSelectedForemanName] = useState<string>("");
 
   const siteIncharges = useMemo(
     () => users.filter((u) => u.role === "site_incharge"),
