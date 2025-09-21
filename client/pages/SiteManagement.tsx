@@ -252,9 +252,12 @@ export default function SiteManagement() {
                 const expanded = expandedId === s.id;
                 return (
                   <div key={s.id} className="">
-                    <button
+                    <div
+                      role="button"
+                      tabIndex={0}
                       className="grid grid-cols-12 gap-2 w-full p-3 hover:bg-muted/50"
                       onClick={() => setExpandedId(expanded ? null : s.id)}
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedId(expanded ? null : s.id); } }}
                     >
                       <div className="col-span-3 text-left flex items-center gap-2">
                         <UserIcon className="h-4 w-4"/> {incharge?.name || "-"}
@@ -269,7 +272,7 @@ export default function SiteManagement() {
                         <Button size="sm" variant="ghost" onClick={(e)=>{ e.stopPropagation(); openEdit(s); }}><Pencil className="h-4 w-4"/></Button>
                         <Button size="sm" variant="ghost" onClick={(e)=>{ e.stopPropagation(); deleteSite(s); }}><Trash2 className="h-4 w-4"/></Button>
                       </div>
-                    </button>
+                    </div>
 
                     {expanded && (
                       <div className="bg-muted/30 p-4">
