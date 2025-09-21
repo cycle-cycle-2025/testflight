@@ -190,6 +190,108 @@ export default function Sites() {
       </Card>
 
       <div className="text-sm text-gray-600">Showing {sites.length} sites</div>
+
+      <Dialog open={viewOpen} onOpenChange={setViewOpen}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Attendance Details</DialogTitle>
+            <DialogDescription>
+              {selectedForemanName ? `Latest approved attendance for ${selectedForemanName} (last 24 hours window)` : "Latest approved attendance (last 24 hours window)"}
+            </DialogDescription>
+          </DialogHeader>
+
+          {viewLoading ? (
+            <div className="text-gray-500">Loading...</div>
+          ) : !selectedRecord ? (
+            <div className="text-gray-500">No approved attendance found in the current 24-hour window.</div>
+          ) : (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="text-2xl font-bold">{selectedRecord.totalWorkers}</div>
+                    <p className="text-sm text-gray-600">Total Workers</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="text-2xl font-bold text-green-600">{selectedRecord.presentWorkers}</div>
+                    <p className="text-sm text-gray-600">Present</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="text-2xl font-bold">{selectedRecord.inTime || '-'}</div>
+                    <p className="text-sm text-gray-600">In Time</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="text-2xl font-bold">{selectedRecord.outTime || '-'}</div>
+                    <p className="text-sm text-gray-600">Out Time</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Attendance Table</CardTitle>
+                  <CardDescription>Same format as submission and admin view</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Worker Name</TableHead>
+                          <TableHead>Designation</TableHead>
+                          <TableHead className="w-40 relative px-4" colSpan={2}>
+                            <div className="grid grid-cols-2 place-items-center h-8">
+                              <span className="text-[13px]">X</span>
+                              <span className="text-[13px]">Y</span>
+                            </div>
+                            <span className="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center text-[14px] text-muted-foreground">P</span>
+                          </TableHead>
+                          <TableHead>Total</TableHead>
+                          <TableHead>Remarks</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {selectedRecord.entries.map((entry, idx) => (
+                          <TableRow key={idx}>
+                            <TableCell>
+                              {entry.isPresent ? (
+                                <Badge variant="default" className="bg-green-100 text-green-800">Present</Badge>
+                              ) : (
+                                <Badge variant="secondary" className="bg-red-100 text-red-800">Absent</Badge>
+                              )}
+                            </TableCell>
+                            <TableCell className="font-medium">{entry.workerName}</TableCell>
+                            <TableCell>
+                              <Badge variant="secondary">{entry.designation}</Badge>
+                            </TableCell>
+                            <TableCell className="relative px-4" colSpan={2}>
+                              <div className="grid grid-cols-2 place-items-center h-8">
+                                <span>{entry.isPresent ? ((entry.formulaX ?? Math.floor((entry.hoursWorked || 0) / 8)) || 0) : '-'}</span>
+                                <span>{entry.isPresent ? ((entry.formulaY ?? ((entry.hoursWorked || 0) % 8)) || 0) : '-'}</span>
+                              </div>
+                              <span className="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center text-[14px] text-muted-foreground">P</span>
+                            </TableCell>
+                            <TableCell>{entry.isPresent ? ((((entry.formulaX ?? Math.floor((entry.hoursWorked || 0)/8)) || 0) * 8) + (((entry.formulaY ?? ((entry.hoursWorked || 0)%8)) || 0))) : '-'}</TableCell>
+                            <TableCell className="max-w-[200px] truncate">{entry.remarks || '-'}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 }
