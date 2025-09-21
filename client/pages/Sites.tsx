@@ -137,9 +137,42 @@ export default function Sites() {
                                   <span className="font-medium">{f.name}</span>
                                 </div>
                                 <div className="col-span-2 text-right">
-                                  <a className="inline-block h-8 px-3 rounded-md bg-primary text-primary-foreground text-sm flex items-center justify-center" href={`/attendance/records?foremanId=${f.id}&name=${encodeURIComponent(f.name)}`}>
+                                  <button
+                                    className="h-8 px-3 rounded-md bg-primary text-primary-foreground text-sm"
+                                    onClick={async () => {
+                                      setSelectedRecord(null);
+                                      setSelectedForemanName(f.name);
+                                      setViewOpen(true);
+                                      setViewLoading(true);
+                                      try {
+                                        const token = localStorage.getItem("auth_token");
+                                        const res = await fetch(`/api/attendance/foreman/${f.id}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+                                        const data: ApiResponse<import("@shared/api").AttendanceRecord[]> = await res.json();
+                                        if (data.success && data.data) {
+                                          const now = new Date();
+                                          const startAnchor = new Date();
+                                          startAnchor.setHours(5, 30, 0, 0);
+                                          let windowStart = new Date(startAnchor);
+                                          if (now < startAnchor) {
+                                            windowStart = new Date(startAnchor.getTime() - 24 * 60 * 60 * 1000);
+                                          }
+                                          const windowEnd = new Date(windowStart.getTime() + 24 * 60 * 60 * 1000);
+                                          const rec = data.data.find(
+                                            (r) =>
+                                              r.status === "admin_approved" &&
+                                              r.approvedAt &&
+                                              new Date(r.approvedAt) >= windowStart &&
+                                              new Date(r.approvedAt) < windowEnd,
+                                          ) || null;
+                                          setSelectedRecord(rec);
+                                        }
+                                      } finally {
+                                        setViewLoading(false);
+                                      }
+                                    }}
+                                  >
                                     View
-                                  </a>
+                                  </button>
                                 </div>
                               </div>
                             ))
