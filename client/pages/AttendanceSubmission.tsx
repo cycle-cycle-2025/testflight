@@ -56,17 +56,24 @@ export default function AttendanceSubmission() {
 
   const fetchWorkers = async () => {
     try {
-      const response = await fetch(`/api/workers/site/${user?.siteId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
-        },
-      });
-      const result: ApiResponse<Worker[]> = await response.json();
-
-      if (result.success && result.data) {
-        setWorkers(result.data);
-        initializeAttendanceEntries(result.data);
+      const siteId = user?.siteId;
+      const token = localStorage.getItem("auth_token");
+      if (!siteId || !token) {
+        throw new Error("Missing site or auth");
       }
+      const response = await fetch(`/api/workers/site/${siteId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) {
+        const text = await response.text().catch(() => "");
+        throw new Error(text || `HTTP ${response.status}`);
+      }
+      const result: ApiResponse<Worker[]> = await response.json();
+      if (!result.success || !result.data) {
+        throw new Error(result.message || "Request failed");
+      }
+      setWorkers(result.data);
+      initializeAttendanceEntries(result.data);
     } catch (error) {
       toast({
         title: "Error",
@@ -151,7 +158,7 @@ export default function AttendanceSubmission() {
       const draftKey = getDraftKey(new Date(selectedDate));
       const stored = localStorage.getItem(draftKey);
       if (!stored) {
-        toast({ title: "ड्राफ्ट नहीं मिला", description: "इस तारीख के लिए कोई सेव ड्राफ्ट उपलब्ध नहीं है" });
+        toast({ title: "ड्राफ्ट नहीं मिला", description: "इस तारीख के लिए कोई सेव ड्राफ्ट उ���लब्ध नहीं है" });
         return;
       }
       const parsed: EntryWithFormula[] = JSON.parse(stored);
