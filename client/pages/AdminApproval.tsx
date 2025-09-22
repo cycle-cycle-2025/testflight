@@ -224,7 +224,7 @@ export default function AdminApproval() {
             {selectedRecord && (
               <div className="space-y-6">
                 {/* Summary Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
                   <Card>
                     <CardContent className="p-4">
                       <div className="text-2xl font-bold">{selectedRecord.totalWorkers}</div>
@@ -249,6 +249,18 @@ export default function AdminApproval() {
                         {Math.round((selectedRecord.presentWorkers / selectedRecord.totalWorkers) * 100)}%
                       </div>
                       <p className="text-sm text-gray-600">Attendance Rate</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="text-2xl font-bold">{selectedRecord.inTime || '-'}</div>
+                      <p className="text-sm text-gray-600">In Time</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="text-2xl font-bold">{selectedRecord.outTime || '-'}</div>
+                      <p className="text-sm text-gray-600">Out Time</p>
                     </CardContent>
                   </Card>
                 </div>
