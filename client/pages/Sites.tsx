@@ -131,8 +131,8 @@ export default function Sites() {
                     <AccordionContent>
                       <div className="border rounded-md">
                         <div className="grid grid-cols-12 gap-2 p-3 text-sm text-gray-600 bg-muted/30">
-                          <div className="col-span-4">Site Foremen</div>
-                          <div className="col-span-8 text-right"></div>
+                          <div className="col-span-6">Site Foremen</div>
+                          <div className="col-span-6 text-right">Status</div>
                         </div>
                         <div className="p-3 space-y-2">
                           {siteForemen.length === 0 ? (
