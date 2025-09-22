@@ -339,18 +339,34 @@ export default function AdminApproval() {
                                 <Badge variant="secondary">{entry.designation}</Badge>
                               </TableCell>
                               <TableCell className="relative px-4" colSpan={2}>
-                                <div className="grid grid-cols-2 place-items-center h-8">
-                                  <span>
-                                    {entry.isPresent ? ((entry.formulaX ?? Math.floor((entry.hoursWorked || 0) / 8)) || 0) : '-'}
-                                  </span>
-                                  <span>
-                                    {entry.isPresent ? ((entry.formulaY ?? ((entry.hoursWorked || 0) % 8)) || 0) : '-'}
-                                  </span>
-                                </div>
+                                {editMode ? (
+                                  <div className="grid grid-cols-2 place-items-center h-8 gap-2">
+                                    <input type="number" className="w-12 border rounded px-1 text-center" min={0} value={entry.formulaX ?? Math.floor((entry.hoursWorked || 0)/8) || 0} onChange={(e)=>{
+                                      const val = parseInt(e.target.value || '0', 10);
+                                      setEditableEntries(prev => prev.map((en,i)=> i===index ? { ...en, formulaX: isNaN(val)?0:val, isPresent: true } : en));
+                                    }} />
+                                    <input type="number" className="w-12 border rounded px-1 text-center" min={0} max={7} value={entry.formulaY ?? ((entry.hoursWorked || 0)%8) || 0} onChange={(e)=>{
+                                      const val = parseInt(e.target.value || '0', 10);
+                                      setEditableEntries(prev => prev.map((en,i)=> i===index ? { ...en, formulaY: Math.max(0, Math.min(7, isNaN(val)?0:val)), isPresent: true } : en));
+                                    }} />
+                                  </div>
+                                ) : (
+                                  <div className="grid grid-cols-2 place-items-center h-8">
+                                    <span>
+                                      {entry.isPresent ? ((entry.formulaX ?? Math.floor((entry.hoursWorked || 0) / 8)) || 0) : '-'}
+                                    </span>
+                                    <span>
+                                      {entry.isPresent ? ((entry.formulaY ?? ((entry.hoursWorked || 0) % 8)) || 0) : '-'}
+                                    </span>
+                                  </div>
+                                )}
                                 <span className="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center text-[14px] text-muted-foreground">P</span>
                               </TableCell>
                               <TableCell>{entry.isPresent ? ((((entry.formulaX ?? Math.floor((entry.hoursWorked || 0)/8)) || 0) * 8) + (((entry.formulaY ?? ((entry.hoursWorked || 0)%8)) || 0))) : '-'}</TableCell>
-                              <TableCell className="max-w-[200px] truncate">{entry.remarks || '-'}</TableCell>
+                              <TableCell className="max-w-[200px] truncate">{editMode ? (
+                                <input className="w-full border rounded px-2 py-1" value={entry.remarks || ''} onChange={(e)=> setEditableEntries(prev=> prev.map((en,i)=> i===index ? { ...en, remarks: e.target.value } : en))}/>
+                              ) : (entry.remarks || '-')}
+                              </TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
