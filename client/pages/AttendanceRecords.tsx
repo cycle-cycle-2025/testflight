@@ -58,13 +58,15 @@ export default function AttendanceRecords() {
         if (now < startAnchor) {
           windowStart = new Date(startAnchor.getTime() - 24 * 60 * 60 * 1000);
         }
+        const fortyDaysAgo = new Date(now.getTime() - 40 * 24 * 60 * 60 * 1000);
         const filtered = data.data
           .filter(r => r.status === 'admin_approved')
           .filter(r => {
             const approvedAt = r.approvedAt ? new Date(r.approvedAt) : new Date(r.date);
-            return approvedAt < windowStart;
+            // older than current window, within last 40 days
+            return approvedAt < windowStart && approvedAt >= fortyDaysAgo;
           })
-          .filter((r) => r.date.split("T")[0] === selectedDate);
+          .sort((a,b)=> new Date(b.date).getTime() - new Date(a.date).getTime());
         setRecords(filtered);
       } else {
         setRecords([]);
