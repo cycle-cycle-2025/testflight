@@ -140,9 +140,12 @@ export default function Sites() {
                           ) : (
                             siteForemen.map((f) => (
                               <div key={f.id} className="grid grid-cols-12 items-center gap-2">
-                                <div className="col-span-10 flex items-center gap-2">
+                                <div className="col-span-6 flex items-center gap-2">
                                   <div className="h-6 w-6 rounded-sm bg-gray-100 flex items-center justify-center text-xs">{f.name.charAt(0)}</div>
                                   <span className="font-medium">{f.name}</span>
+                                </div>
+                                <div className="col-span-4 text-right">
+                                  <span className="text-xs px-2 py-1 rounded bg-muted">{statusMap[f.id] || "Loading..."}</span>
                                 </div>
                                 <div className="col-span-2 text-right">
                                   <button
