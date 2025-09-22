@@ -375,6 +375,20 @@ export default function AdminApproval() {
                   </CardContent>
                 </Card>
 
+                {/* In/Out editable when editMode */}
+                {editMode && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium">In Time</label>
+                      <input className="w-full border rounded px-2 py-1" value={editableInTime || ''} onChange={(e)=>setEditableInTime(e.target.value)} placeholder="HH:MM" />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Out Time</label>
+                      <input className="w-full border rounded px-2 py-1" value={editableOutTime || ''} onChange={(e)=>setEditableOutTime(e.target.value)} placeholder="HH:MM" />
+                    </div>
+                  </div>
+                )}
+
                 {/* Admin Comments */}
                 {showActions && (
                   <div className="space-y-2">
