@@ -30,6 +30,7 @@ export default function Sites() {
   const [viewLoading, setViewLoading] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<import("@shared/api").AttendanceRecord | null>(null);
   const [selectedForemanName, setSelectedForemanName] = useState<string>("");
+  const [statusMap, setStatusMap] = useState<Record<string, string>>({});
 
   const siteIncharges = useMemo(
     () => users.filter((u) => u.role === "site_incharge"),
