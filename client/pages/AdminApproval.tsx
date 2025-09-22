@@ -321,7 +321,7 @@ export default function AdminApproval() {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {selectedRecord.entries.map((entry, index) => (
+                          {(editMode ? editableEntries : selectedRecord.entries).map((entry, index) => (
                             <TableRow key={index}>
                               <TableCell>
                                 {entry.isPresent ? (
