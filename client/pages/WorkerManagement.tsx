@@ -181,7 +181,7 @@ export default function WorkerManagement() {
                     <Input id="name" required value={form.name} onChange={(e)=>setForm({ ...form, name: e.target.value })} />
                   </div>
                   <div>
-                    <Label htmlFor="fatherName">पिता ���ा नाम</Label>
+                    <Label htmlFor="fatherName">पिता का नाम</Label>
                     <Input id="fatherName" required value={form.fatherName} onChange={(e)=>setForm({ ...form, fatherName: e.target.value })} />
                   </div>
                   <div>
