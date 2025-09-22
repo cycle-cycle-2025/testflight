@@ -51,6 +51,10 @@ export default function AdminApproval() {
   const [adminComments, setAdminComments] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [editableEntries, setEditableEntries] = useState<any[]>([]);
+  const [editableInTime, setEditableInTime] = useState<string | undefined>(undefined);
+  const [editableOutTime, setEditableOutTime] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     fetchAttendanceRecords();
