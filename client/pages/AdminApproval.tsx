@@ -402,6 +402,40 @@ export default function AdminApproval() {
                   </div>
                 )}
 
+                {/* Edit Controls */}
+                <div className="flex justify-between items-center">
+                  <div className="text-sm text-gray-600">{editMode ? 'Editing enabled' : 'View only'}</div>
+                  <div className="flex gap-2">
+                    {!editMode ? (
+                      <Button variant="outline" onClick={()=> setEditMode(true)}>Edit</Button>
+                    ) : (
+                      <>
+                        <Button variant="outline" onClick={()=>{ setEditMode(false); setEditableEntries(selectedRecord.entries.map(e=>({...e}))); setEditableInTime(selectedRecord.inTime); setEditableOutTime(selectedRecord.outTime); }}>Cancel</Button>
+                        <Button onClick={async ()=>{
+                          try {
+                            const resp = await fetch(`/api/attendance/${selectedRecord.id}`, {
+                              method: 'PUT',
+                              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('auth_token')}` },
+                              body: JSON.stringify({ entries: editableEntries, inTime: editableInTime ?? null, outTime: editableOutTime ?? null })
+                            });
+                            const result: ApiResponse<AttendanceRecord> = await resp.json();
+                            if (result.success && result.data) {
+                              setSelectedRecord(result.data);
+                              setEditMode(false);
+                              toast({ title: 'Updated', description: 'Attendance updated successfully' });
+                              fetchAttendanceRecords();
+                            } else {
+                              throw new Error(result.message);
+                            }
+                          } catch {
+                            toast({ title: 'Error', description: 'Failed to update attendance', variant: 'destructive' });
+                          }
+                        }}>Save</Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+
                 {/* Action Buttons */}
                 {showActions && (
                   <div className="flex justify-end space-x-4">
