@@ -83,6 +83,7 @@ export function createServer() {
   app.post("/api/attendance/review/:id", handleReviewAttendance);
   app.get("/api/attendance/pending-admin", handlePendingAdmin);
   app.post("/api/attendance/admin-approve/:id", handleAdminApprove);
+  app.put("/api/attendance/:id", handleAdminUpdateAttendance);
   app.get("/api/attendance/approved", handleApprovedRecords);
   app.get("/api/attendance/check/:date", handleCheckSubmission);
   app.get("/api/attendance/foreman/:foremanId", handleAttendanceByForeman);
