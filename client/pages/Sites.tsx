@@ -118,7 +118,26 @@ export default function Sites() {
                 const siteForemen = foremen.filter((f) => f.siteId === site.id);
                 return (
                   <AccordionItem key={site.id} value={site.id}>
-                    <AccordionTrigger>
+                    <AccordionTrigger onClick={async () => {
+                      try {
+                        const token = localStorage.getItem("auth_token");
+                        const resPromises = siteForemen.map(async (f) => {
+                          if (statusMap[f.id]) return;
+                          const res = await fetch(`/api/attendance/foreman/${f.id}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+                          const data: ApiResponse<import("@shared/api").AttendanceRecord[]> = await res.json();
+                          let status = "attendance not taken";
+                          if (data.success && data.data && data.data.length) {
+                            const latest = data.data[0];
+                            if (latest.status === 'submitted') status = 'attendance submitted';
+                            else if (latest.status === 'incharge_reviewed') status = 'attendance not approved';
+                            else if (latest.status === 'admin_approved') status = 'approved';
+                            else if (latest.status === 'rejected') status = 'rejected';
+                          }
+                          setStatusMap(prev => ({ ...prev, [f.id]: status }));
+                        });
+                        await Promise.all(resPromises);
+                      } catch {}
+                    }}>
                       <div className="grid grid-cols-12 gap-2 w-full text-left">
                         <div className="col-span-3 flex items-center gap-2">
                           <span className="font-medium">{incharge?.name || '-'}</span>
