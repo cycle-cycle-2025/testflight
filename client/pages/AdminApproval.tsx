@@ -99,6 +99,10 @@ export default function AdminApproval() {
   const openRecordForApproval = (record: AttendanceRecord) => {
     setSelectedRecord(record);
     setAdminComments("");
+    setEditMode(false);
+    setEditableEntries(record.entries.map(e => ({ ...e })));
+    setEditableInTime(record.inTime);
+    setEditableOutTime(record.outTime);
   };
 
   const processRecord = async (action: 'approve' | 'reject') => {
