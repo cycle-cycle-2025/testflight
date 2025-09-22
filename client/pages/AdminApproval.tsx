@@ -297,7 +297,9 @@ export default function AdminApproval() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Attendance Details</CardTitle>
-                    <CardDescription>Worker-wise attendance breakdown</CardDescription>
+                    <CardDescription>
+                      Date: {new Date(selectedRecord.date).toLocaleDateString()}
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="rounded-md border">
