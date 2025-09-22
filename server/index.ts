@@ -32,6 +32,7 @@ import {
   handleReviewAttendance,
   handlePendingAdmin,
   handleAdminApprove,
+  handleAdminUpdateAttendance,
   handleApprovedRecords,
   handleCheckSubmission,
   handleAttendanceByForeman,
