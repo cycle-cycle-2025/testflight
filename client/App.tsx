@@ -200,6 +200,15 @@ function App() {
           />
 
           <Route
+            path="/attendance"
+            element={
+              <ProtectedRoute requiredRole={["admin"]}>
+                <Sites />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/users/add"
             element={
               <ProtectedRoute requiredRole={["admin"]}>

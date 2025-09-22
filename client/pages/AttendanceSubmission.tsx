@@ -46,33 +46,51 @@ export default function AttendanceSubmission() {
   const [pickMinute, setPickMinute] = useState<number>(0);
   const [pickAmPm, setPickAmPm] = useState<"AM" | "PM">("AM");
 
-  const didFetchRef = useRef(false);
   useEffect(() => {
-    if (didFetchRef.current) return;
-    didFetchRef.current = true;
+    const token = localStorage.getItem("auth_token");
+    if (!user?.siteId) {
+      setIsLoading(false);
+      toast({ title: "Site not assigned", description: "Your account is not linked to any site. Please ask admin to assign a site.", variant: "destructive" });
+      return;
+    }
+    if (!token) {
+      setIsLoading(false);
+      toast({ title: "Not authenticated", description: "Please sign in again.", variant: "destructive" });
+      return;
+    }
     fetchWorkers();
     checkSubmissionForDate(selectedDate);
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.siteId]);
 
   const fetchWorkers = async () => {
     try {
-      const response = await fetch(`/api/workers/site/${user?.siteId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
-        },
-      });
-      const result: ApiResponse<Worker[]> = await response.json();
-
-      if (result.success && result.data) {
-        setWorkers(result.data);
-        initializeAttendanceEntries(result.data);
+      const siteId = user?.siteId;
+      const token = localStorage.getItem("auth_token");
+      if (!siteId || !token) {
+        throw new Error("Missing site or auth");
       }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to fetch workers list",
-        variant: "destructive",
+      const response = await fetch(`/api/workers/site/${siteId}`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
+      if (!response.ok) {
+        const contentType = response.headers.get("content-type") || "";
+        if (contentType.includes("application/json")) {
+          const body = await response.json().catch(() => ({}));
+          throw new Error(body.message || `HTTP ${response.status}`);
+        }
+        const text = await response.text().catch(() => "");
+        throw new Error(text || `HTTP ${response.status}`);
+      }
+      const result: ApiResponse<Worker[]> = await response.json();
+      if (!result.success || !result.data) {
+        throw new Error(result.message || "Request failed");
+      }
+      setWorkers(result.data);
+      initializeAttendanceEntries(result.data);
+    } catch (error: any) {
+      const msg = typeof error?.message === 'string' ? error.message : 'Failed to fetch workers list';
+      toast({ title: "Error", description: msg, variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
@@ -353,7 +371,7 @@ export default function AttendanceSubmission() {
             <div className="flex items-center justify-between mx-auto text-center">
               <div className="flex flex-col">
                 <CardTitle className="text-2xl font-semibold tracking-tight">Attendance Records</CardTitle>
-                <CardDescription className="text-sm leading-5 font-normal">इन टाइम, आउट टाइम और काम के घंटे</CardDescription>
+                <CardDescription className="text-sm leading-5 font-normal">इन टाइम, आउट टाइम और काम के घंट��</CardDescription>
                 <div className="mt-2">
                   <Button variant="secondary" size="sm" onClick={loadDraft}>Load Draft</Button>
                 </div>

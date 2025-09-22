@@ -22,6 +22,8 @@ import {
   handleDeleteUser,
   handleCreateSite,
   handleListSites,
+  handleUpdateSite,
+  handleDeleteSite,
 } from "./routes/admin.js";
 import {
   handleSubmitAttendance,
@@ -30,6 +32,7 @@ import {
   handleReviewAttendance,
   handlePendingAdmin,
   handleAdminApprove,
+  handleAdminUpdateAttendance,
   handleApprovedRecords,
   handleCheckSubmission,
   handleAttendanceByForeman,
@@ -81,6 +84,7 @@ export function createServer() {
   app.post("/api/attendance/review/:id", handleReviewAttendance);
   app.get("/api/attendance/pending-admin", handlePendingAdmin);
   app.post("/api/attendance/admin-approve/:id", handleAdminApprove);
+  app.put("/api/attendance/:id", handleAdminUpdateAttendance);
   app.get("/api/attendance/approved", handleApprovedRecords);
   app.get("/api/attendance/check/:date", handleCheckSubmission);
   app.get("/api/attendance/foreman/:foremanId", handleAttendanceByForeman);
@@ -90,6 +94,10 @@ export function createServer() {
   app.post("/api/workers", handleCreateWorker);
   app.put("/api/workers/:id", handleUpdateWorker);
   app.delete("/api/workers/:id", handleDeleteWorker);
+
+  // Sites
+  app.put("/api/sites/:id", handleUpdateSite);
+  app.delete("/api/sites/:id", handleDeleteSite);
 
   return app;
 }
