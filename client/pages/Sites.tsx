@@ -7,8 +7,21 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../components/ui/dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "../components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../components/ui/table";
 import { Badge } from "../components/ui/badge";
 import {
   Accordion,
@@ -28,7 +41,9 @@ export default function Sites() {
   const [query, setQuery] = useState("");
   const [viewOpen, setViewOpen] = useState(false);
   const [viewLoading, setViewLoading] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState<import("@shared/api").AttendanceRecord | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<
+    import("@shared/api").AttendanceRecord | null
+  >(null);
   const [selectedForemanName, setSelectedForemanName] = useState<string>("");
   const [statusMap, setStatusMap] = useState<Record<string, string>>({});
 
@@ -69,12 +84,13 @@ export default function Sites() {
     );
   }
 
-
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Attendance</h1>
-        <p className="text-gray-600">Browse sites and view attendance per foreman</p>
+        <p className="text-gray-600">
+          Browse sites and view attendance per foreman
+        </p>
       </div>
 
       <div className="max-w-md">
@@ -82,7 +98,7 @@ export default function Sites() {
           placeholder="Search sites..."
           className="border rounded-md h-10 px-3 w-full"
           value={query}
-          onChange={(e)=>setQuery(e.target.value)}
+          onChange={(e) => setQuery(e.target.value)}
         />
       </div>
 
@@ -90,7 +106,8 @@ export default function Sites() {
         <CardHeader>
           <CardTitle>Attendance</CardTitle>
           <CardDescription>
-            Tap a site to expand and view foremen; click a foreman to view attendance
+            Tap a site to expand and view foremen; click a foreman to view
+            attendance
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -109,111 +126,186 @@ export default function Sites() {
                 value={expandedSites}
                 onValueChange={(v) => setExpandedSites(v as string[])}
               >
-              {sites
-                .filter((site) => site.name.toLowerCase().includes(query.toLowerCase()))
-                .map((site) => {
-                const incharge = siteIncharges.find(
-                  (u) => u.id === site.inchargeId,
-                );
-                const siteForemen = foremen.filter((f) => f.siteId === site.id);
-                return (
-                  <AccordionItem key={site.id} value={site.id}>
-                    <AccordionTrigger onClick={async () => {
-                      try {
-                        const token = localStorage.getItem("auth_token");
-                        const resPromises = siteForemen.map(async (f) => {
-                          if (statusMap[f.id]) return;
-                          const res = await fetch(`/api/attendance/foreman/${f.id}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
-                          const data: ApiResponse<import("@shared/api").AttendanceRecord[]> = await res.json();
-                          let status = "attendance not taken";
-                          if (data.success && data.data && data.data.length) {
-                            const latest = data.data[0];
-                            if (latest.status === 'submitted') status = 'attendance submitted';
-                            else if (latest.status === 'incharge_reviewed') status = 'attendance not approved';
-                            else if (latest.status === 'admin_approved') status = 'approved';
-                            else if (latest.status === 'rejected') status = 'rejected';
-                          }
-                          setStatusMap(prev => ({ ...prev, [f.id]: status }));
-                        });
-                        await Promise.all(resPromises);
-                      } catch {}
-                    }}>
-                      <div className="grid grid-cols-12 gap-2 w-full text-left">
-                        <div className="col-span-3 flex items-center gap-2">
-                          <span className="font-medium">{incharge?.name || '-'}</span>
-                        </div>
-                        <div className="col-span-3 font-medium">{site.name}</div>
-                        <div className="col-span-4 text-gray-600">{site.location}</div>
-                        <div className="col-span-2">{siteForemen.length}</div>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className="border rounded-md">
-                        <div className="grid grid-cols-12 gap-2 p-3 text-sm text-gray-600 bg-muted/30">
-                          <div className="col-span-6">Site Foremen</div>
-                          <div className="col-span-6 text-right">Status</div>
-                        </div>
-                        <div className="p-3 space-y-2">
-                          {siteForemen.length === 0 ? (
-                            <div className="text-gray-500">No foremen assigned.</div>
-                          ) : (
-                            siteForemen.map((f) => (
-                              <div key={f.id} className="grid grid-cols-12 items-center gap-2">
-                                <div className="col-span-6 flex items-center gap-2">
-                                  <div className="h-6 w-6 rounded-sm bg-gray-100 flex items-center justify-center text-xs">{f.name.charAt(0)}</div>
-                                  <span className="font-medium">{f.name}</span>
-                                </div>
-                                <div className="col-span-4 text-right">
-                                  <span className="text-xs px-2 py-1 rounded bg-muted">{statusMap[f.id] || "Loading..."}</span>
-                                </div>
-                                <div className="col-span-2 text-right">
-                                  <button
-                                    className="h-8 px-3 rounded-md bg-primary text-primary-foreground text-sm"
-                                    onClick={async () => {
-                                      setSelectedRecord(null);
-                                      setSelectedForemanName(f.name);
-                                      setViewOpen(true);
-                                      setViewLoading(true);
-                                      try {
-                                        const token = localStorage.getItem("auth_token");
-                                        const res = await fetch(`/api/attendance/foreman/${f.id}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
-                                        const data: ApiResponse<import("@shared/api").AttendanceRecord[]> = await res.json();
-                                        if (data.success && data.data) {
-                                          const now = new Date();
-                                          const startAnchor = new Date();
-                                          startAnchor.setHours(5, 30, 0, 0);
-                                          let windowStart = new Date(startAnchor);
-                                          if (now < startAnchor) {
-                                            windowStart = new Date(startAnchor.getTime() - 24 * 60 * 60 * 1000);
-                                          }
-                                          const windowEnd = new Date(windowStart.getTime() + 24 * 60 * 60 * 1000);
-                                          const rec = data.data.find(
-                                            (r) =>
-                                              r.status === "admin_approved" &&
-                                              r.approvedAt &&
-                                              new Date(r.approvedAt) >= windowStart &&
-                                              new Date(r.approvedAt) < windowEnd,
-                                          ) || null;
-                                          setSelectedRecord(rec);
-                                        }
-                                      } finally {
-                                        setViewLoading(false);
-                                      }
-                                    }}
-                                  >
-                                    View
-                                  </button>
-                                </div>
+                {sites
+                  .filter((site) =>
+                    site.name.toLowerCase().includes(query.toLowerCase()),
+                  )
+                  .map((site) => {
+                    const incharge = siteIncharges.find(
+                      (u) => u.id === site.inchargeId,
+                    );
+                    const siteForemen = foremen.filter(
+                      (f) => f.siteId === site.id,
+                    );
+                    return (
+                      <AccordionItem key={site.id} value={site.id}>
+                        <AccordionTrigger
+                          onClick={async () => {
+                            try {
+                              const token = localStorage.getItem("auth_token");
+                              const resPromises = siteForemen.map(async (f) => {
+                                if (statusMap[f.id]) return;
+                                const res = await fetch(
+                                  `/api/attendance/foreman/${f.id}`,
+                                  {
+                                    headers: token
+                                      ? { Authorization: `Bearer ${token}` }
+                                      : {},
+                                  },
+                                );
+                                const data: ApiResponse<
+                                  import("@shared/api").AttendanceRecord[]
+                                > = await res.json();
+                                let status = "attendance not taken";
+                                if (
+                                  data.success &&
+                                  data.data &&
+                                  data.data.length
+                                ) {
+                                  const latest = data.data[0];
+                                  if (latest.status === "submitted")
+                                    status = "attendance submitted";
+                                  else if (
+                                    latest.status === "incharge_reviewed"
+                                  )
+                                    status = "attendance not approved";
+                                  else if (latest.status === "admin_approved")
+                                    status = "approved";
+                                  else if (latest.status === "rejected")
+                                    status = "rejected";
+                                }
+                                setStatusMap((prev) => ({
+                                  ...prev,
+                                  [f.id]: status,
+                                }));
+                              });
+                              await Promise.all(resPromises);
+                            } catch {}
+                          }}
+                        >
+                          <div className="grid grid-cols-12 gap-2 w-full text-left">
+                            <div className="col-span-3 flex items-center gap-2">
+                              <span className="font-medium">
+                                {incharge?.name || "-"}
+                              </span>
+                            </div>
+                            <div className="col-span-3 font-medium">
+                              {site.name}
+                            </div>
+                            <div className="col-span-4 text-gray-600">
+                              {site.location}
+                            </div>
+                            <div className="col-span-2">
+                              {siteForemen.length}
+                            </div>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="border rounded-md">
+                            <div className="grid grid-cols-12 gap-2 p-3 text-sm text-gray-600 bg-muted/30">
+                              <div className="col-span-6">Site Foremen</div>
+                              <div className="col-span-6 text-right">
+                                Status
                               </div>
-                            ))
-                          )}
-                        </div>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                );
-              })}
-            </Accordion>
+                            </div>
+                            <div className="p-3 space-y-2">
+                              {siteForemen.length === 0 ? (
+                                <div className="text-gray-500">
+                                  No foremen assigned.
+                                </div>
+                              ) : (
+                                siteForemen.map((f) => (
+                                  <div
+                                    key={f.id}
+                                    className="grid grid-cols-12 items-center gap-2"
+                                  >
+                                    <div className="col-span-6 flex items-center gap-2">
+                                      <div className="h-6 w-6 rounded-sm bg-gray-100 flex items-center justify-center text-xs">
+                                        {f.name.charAt(0)}
+                                      </div>
+                                      <span className="font-medium">
+                                        {f.name}
+                                      </span>
+                                    </div>
+                                    <div className="col-span-4 text-right">
+                                      <span className="text-xs px-2 py-1 rounded bg-muted">
+                                        {statusMap[f.id] || "Loading..."}
+                                      </span>
+                                    </div>
+                                    <div className="col-span-2 text-right">
+                                      <button
+                                        className="h-8 px-3 rounded-md bg-primary text-primary-foreground text-sm"
+                                        onClick={async () => {
+                                          setSelectedRecord(null);
+                                          setSelectedForemanName(f.name);
+                                          setViewOpen(true);
+                                          setViewLoading(true);
+                                          try {
+                                            const token =
+                                              localStorage.getItem(
+                                                "auth_token",
+                                              );
+                                            const res = await fetch(
+                                              `/api/attendance/foreman/${f.id}`,
+                                              {
+                                                headers: token
+                                                  ? {
+                                                      Authorization: `Bearer ${token}`,
+                                                    }
+                                                  : {},
+                                              },
+                                            );
+                                            const data: ApiResponse<
+                                              import("@shared/api").AttendanceRecord[]
+                                            > = await res.json();
+                                            if (data.success && data.data) {
+                                              const now = new Date();
+                                              const startAnchor = new Date();
+                                              startAnchor.setHours(5, 30, 0, 0);
+                                              let windowStart = new Date(
+                                                startAnchor,
+                                              );
+                                              if (now < startAnchor) {
+                                                windowStart = new Date(
+                                                  startAnchor.getTime() -
+                                                    24 * 60 * 60 * 1000,
+                                                );
+                                              }
+                                              const windowEnd = new Date(
+                                                windowStart.getTime() +
+                                                  24 * 60 * 60 * 1000,
+                                              );
+                                              const rec =
+                                                data.data.find(
+                                                  (r) =>
+                                                    r.status ===
+                                                      "admin_approved" &&
+                                                    r.approvedAt &&
+                                                    new Date(r.approvedAt) >=
+                                                      windowStart &&
+                                                    new Date(r.approvedAt) <
+                                                      windowEnd,
+                                                ) || null;
+                                              setSelectedRecord(rec);
+                                            }
+                                          } finally {
+                                            setViewLoading(false);
+                                          }
+                                        }}
+                                      >
+                                        View
+                                      </button>
+                                    </div>
+                                  </div>
+                                ))
+                              )}
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    );
+                  })}
+              </Accordion>
             </>
           )}
         </CardContent>
@@ -226,38 +318,50 @@ export default function Sites() {
           <DialogHeader>
             <DialogTitle>Attendance Details</DialogTitle>
             <DialogDescription>
-              {selectedForemanName ? `Latest approved attendance for ${selectedForemanName} (last 24 hours window)` : "Latest approved attendance (last 24 hours window)"}
+              {selectedForemanName
+                ? `Latest approved attendance for ${selectedForemanName} (last 24 hours window)`
+                : "Latest approved attendance (last 24 hours window)"}
             </DialogDescription>
           </DialogHeader>
 
           {viewLoading ? (
             <div className="text-gray-500">Loading...</div>
           ) : !selectedRecord ? (
-            <div className="text-gray-500">No approved attendance found in the current 24-hour window.</div>
+            <div className="text-gray-500">
+              No approved attendance found in the current 24-hour window.
+            </div>
           ) : (
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card>
                   <CardContent className="p-4">
-                    <div className="text-2xl font-bold">{selectedRecord.totalWorkers}</div>
+                    <div className="text-2xl font-bold">
+                      {selectedRecord.totalWorkers}
+                    </div>
                     <p className="text-sm text-gray-600">Total Workers</p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className="p-4">
-                    <div className="text-2xl font-bold text-green-600">{selectedRecord.presentWorkers}</div>
+                    <div className="text-2xl font-bold text-green-600">
+                      {selectedRecord.presentWorkers}
+                    </div>
                     <p className="text-sm text-gray-600">Present</p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className="p-4">
-                    <div className="text-2xl font-bold">{selectedRecord.inTime || '-'}</div>
+                    <div className="text-2xl font-bold">
+                      {selectedRecord.inTime || "-"}
+                    </div>
                     <p className="text-sm text-gray-600">In Time</p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className="p-4">
-                    <div className="text-2xl font-bold">{selectedRecord.outTime || '-'}</div>
+                    <div className="text-2xl font-bold">
+                      {selectedRecord.outTime || "-"}
+                    </div>
                     <p className="text-sm text-gray-600">Out Time</p>
                   </CardContent>
                 </Card>
@@ -266,7 +370,9 @@ export default function Sites() {
               <Card>
                 <CardHeader>
                   <CardTitle>Attendance Table</CardTitle>
-                  <CardDescription>Same format as submission and admin view</CardDescription>
+                  <CardDescription>
+                    Same format as submission and admin view
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="rounded-md border">
@@ -281,7 +387,9 @@ export default function Sites() {
                               <span className="text-[13px]">X</span>
                               <span className="text-[13px]">Y</span>
                             </div>
-                            <span className="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center text-[14px] text-muted-foreground">P</span>
+                            <span className="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center text-[14px] text-muted-foreground">
+                              P
+                            </span>
                           </TableHead>
                           <TableHead>Total</TableHead>
                           <TableHead>Remarks</TableHead>
@@ -292,24 +400,66 @@ export default function Sites() {
                           <TableRow key={idx}>
                             <TableCell>
                               {entry.isPresent ? (
-                                <Badge variant="default" className="bg-green-100 text-green-800">Present</Badge>
+                                <Badge
+                                  variant="default"
+                                  className="bg-green-100 text-green-800"
+                                >
+                                  Present
+                                </Badge>
                               ) : (
-                                <Badge variant="secondary" className="bg-red-100 text-red-800">Absent</Badge>
+                                <Badge
+                                  variant="secondary"
+                                  className="bg-red-100 text-red-800"
+                                >
+                                  Absent
+                                </Badge>
                               )}
                             </TableCell>
-                            <TableCell className="font-medium">{entry.workerName}</TableCell>
+                            <TableCell className="font-medium">
+                              {entry.workerName}
+                            </TableCell>
                             <TableCell>
-                              <Badge variant="secondary">{entry.designation}</Badge>
+                              <Badge variant="secondary">
+                                {entry.designation}
+                              </Badge>
                             </TableCell>
                             <TableCell className="relative px-4" colSpan={2}>
                               <div className="grid grid-cols-2 place-items-center h-8">
-                                <span>{entry.isPresent ? ((entry.formulaX ?? Math.floor((entry.hoursWorked || 0) / 8)) || 0) : '-'}</span>
-                                <span>{entry.isPresent ? ((entry.formulaY ?? ((entry.hoursWorked || 0) % 8)) || 0) : '-'}</span>
+                                <span>
+                                  {entry.isPresent
+                                    ? (entry.formulaX ??
+                                        Math.floor(
+                                          (entry.hoursWorked || 0) / 8,
+                                        )) ||
+                                      0
+                                    : "-"}
+                                </span>
+                                <span>
+                                  {entry.isPresent
+                                    ? (entry.formulaY ??
+                                        (entry.hoursWorked || 0) % 8) ||
+                                      0
+                                    : "-"}
+                                </span>
                               </div>
-                              <span className="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center text-[14px] text-muted-foreground">P</span>
+                              <span className="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center text-[14px] text-muted-foreground">
+                                P
+                              </span>
                             </TableCell>
-                            <TableCell>{entry.isPresent ? ((((entry.formulaX ?? Math.floor((entry.hoursWorked || 0)/8)) || 0) * 8) + (((entry.formulaY ?? ((entry.hoursWorked || 0)%8)) || 0))) : '-'}</TableCell>
-                            <TableCell className="max-w-[200px] truncate">{entry.remarks || '-'}</TableCell>
+                            <TableCell>
+                              {entry.isPresent
+                                ? ((entry.formulaX ??
+                                    Math.floor((entry.hoursWorked || 0) / 8)) ||
+                                    0) *
+                                    8 +
+                                  ((entry.formulaY ??
+                                    (entry.hoursWorked || 0) % 8) ||
+                                    0)
+                                : "-"}
+                            </TableCell>
+                            <TableCell className="max-w-[200px] truncate">
+                              {entry.remarks || "-"}
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -321,7 +471,6 @@ export default function Sites() {
           )}
         </DialogContent>
       </Dialog>
-
     </div>
   );
 }

@@ -3,9 +3,27 @@ import { useAuth } from "../App";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../components/ui/dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "../components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../components/ui/table";
 import { Badge } from "../components/ui/badge";
 import { ApiResponse, AttendanceRecord, User } from "@shared/api";
 
@@ -17,12 +35,17 @@ export default function AttendanceRecords() {
   const qpForemanName = url.searchParams.get("name") || "";
 
   const [foremen, setForemen] = useState<User[]>([]);
-  const [selectedForemanId, setSelectedForemanId] = useState<string>(qpForemanId);
-  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split("T")[0]);
+  const [selectedForemanId, setSelectedForemanId] =
+    useState<string>(qpForemanId);
+  const [selectedDate, setSelectedDate] = useState<string>(
+    new Date().toISOString().split("T")[0],
+  );
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [viewOpen, setViewOpen] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState<AttendanceRecord | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<AttendanceRecord | null>(
+    null,
+  );
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -60,13 +83,17 @@ export default function AttendanceRecords() {
         }
         const fortyDaysAgo = new Date(now.getTime() - 40 * 24 * 60 * 60 * 1000);
         const filtered = data.data
-          .filter(r => r.status === 'admin_approved')
-          .filter(r => {
-            const approvedAt = r.approvedAt ? new Date(r.approvedAt) : new Date(r.date);
+          .filter((r) => r.status === "admin_approved")
+          .filter((r) => {
+            const approvedAt = r.approvedAt
+              ? new Date(r.approvedAt)
+              : new Date(r.date);
             // older than current window, within last 40 days
             return approvedAt < windowStart && approvedAt >= fortyDaysAgo;
           })
-          .sort((a,b)=> new Date(b.date).getTime() - new Date(a.date).getTime());
+          .sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+          );
         setRecords(filtered);
       } else {
         setRecords([]);
@@ -88,7 +115,9 @@ export default function AttendanceRecords() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Attendance Records</h1>
-      <p className="text-gray-600">Pick a date and foreman to view attendance</p>
+      <p className="text-gray-600">
+        Pick a date and foreman to view attendance
+      </p>
 
       <Card>
         <CardHeader>
@@ -98,7 +127,12 @@ export default function AttendanceRecords() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
             <div>
               <Label htmlFor="date">Date</Label>
-              <Input id="date" type="date" value={selectedDate} onChange={(e)=>setSelectedDate(e.target.value)} />
+              <Input
+                id="date"
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+              />
             </div>
             <div>
               <Label htmlFor="foreman">Foreman</Label>
@@ -106,16 +140,24 @@ export default function AttendanceRecords() {
                 id="foreman"
                 className="border rounded-md h-10 px-3 w-full"
                 value={selectedForemanId}
-                onChange={(e)=>setSelectedForemanId(e.target.value)}
+                onChange={(e) => setSelectedForemanId(e.target.value)}
               >
                 <option value="">Select</option>
-                {foremen.map((f)=> (
-                  <option key={f.id} value={f.id}>{f.name}</option>
+                {foremen.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.name}
+                  </option>
                 ))}
               </select>
             </div>
             <div>
-              <Button className="mt-6" onClick={fetchRecords} disabled={!selectedForemanId || loading}>Fetch</Button>
+              <Button
+                className="mt-6"
+                onClick={fetchRecords}
+                disabled={!selectedForemanId || loading}
+              >
+                Fetch
+              </Button>
             </div>
           </div>
         </CardContent>
@@ -133,13 +175,23 @@ export default function AttendanceRecords() {
                 <button
                   key={rec.id}
                   className="w-full border rounded-md p-3 flex items-center justify-between hover:bg-muted/50 text-left"
-                  onClick={() => { setSelectedRecord(rec); setViewOpen(true); }}
+                  onClick={() => {
+                    setSelectedRecord(rec);
+                    setViewOpen(true);
+                  }}
                 >
                   <div>
-                    <div className="font-medium">{new Date(rec.date).toLocaleDateString()}</div>
-                    <div className="text-sm text-gray-600">{rec.presentWorkers}/{rec.totalWorkers} present • {rec.siteName}</div>
+                    <div className="font-medium">
+                      {new Date(rec.date).toLocaleDateString()}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {rec.presentWorkers}/{rec.totalWorkers} present •{" "}
+                      {rec.siteName}
+                    </div>
                   </div>
-                  <div className="text-sm text-gray-600">{selectedForemanName}</div>
+                  <div className="text-sm text-gray-600">
+                    {selectedForemanName}
+                  </div>
                 </button>
               ))}
             </div>
@@ -152,7 +204,9 @@ export default function AttendanceRecords() {
           <DialogHeader>
             <DialogTitle>Attendance Details</DialogTitle>
             <DialogDescription>
-              {selectedForemanName ? `Attendance for ${selectedForemanName}` : 'Attendance Details'}
+              {selectedForemanName
+                ? `Attendance for ${selectedForemanName}`
+                : "Attendance Details"}
             </DialogDescription>
           </DialogHeader>
 
@@ -161,25 +215,33 @@ export default function AttendanceRecords() {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card>
                   <CardContent className="p-4">
-                    <div className="text-2xl font-bold">{selectedRecord.totalWorkers}</div>
+                    <div className="text-2xl font-bold">
+                      {selectedRecord.totalWorkers}
+                    </div>
                     <p className="text-sm text-gray-600">Total Workers</p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className="p-4">
-                    <div className="text-2xl font-bold text-green-600">{selectedRecord.presentWorkers}</div>
+                    <div className="text-2xl font-bold text-green-600">
+                      {selectedRecord.presentWorkers}
+                    </div>
                     <p className="text-sm text-gray-600">Present</p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className="p-4">
-                    <div className="text-2xl font-bold">{selectedRecord.inTime || '-'}</div>
+                    <div className="text-2xl font-bold">
+                      {selectedRecord.inTime || "-"}
+                    </div>
                     <p className="text-sm text-gray-600">In Time</p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className="p-4">
-                    <div className="text-2xl font-bold">{selectedRecord.outTime || '-'}</div>
+                    <div className="text-2xl font-bold">
+                      {selectedRecord.outTime || "-"}
+                    </div>
                     <p className="text-sm text-gray-600">Out Time</p>
                   </CardContent>
                 </Card>
@@ -202,7 +264,9 @@ export default function AttendanceRecords() {
                               <span className="text-[13px]">X</span>
                               <span className="text-[13px]">Y</span>
                             </div>
-                            <span className="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center text-[14px] text-muted-foreground">P</span>
+                            <span className="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center text-[14px] text-muted-foreground">
+                              P
+                            </span>
                           </TableHead>
                           <TableHead>Total</TableHead>
                           <TableHead>Remarks</TableHead>
@@ -213,24 +277,66 @@ export default function AttendanceRecords() {
                           <TableRow key={idx}>
                             <TableCell>
                               {entry.isPresent ? (
-                                <Badge variant="default" className="bg-green-100 text-green-800">Present</Badge>
+                                <Badge
+                                  variant="default"
+                                  className="bg-green-100 text-green-800"
+                                >
+                                  Present
+                                </Badge>
                               ) : (
-                                <Badge variant="secondary" className="bg-red-100 text-red-800">Absent</Badge>
+                                <Badge
+                                  variant="secondary"
+                                  className="bg-red-100 text-red-800"
+                                >
+                                  Absent
+                                </Badge>
                               )}
                             </TableCell>
-                            <TableCell className="font-medium">{entry.workerName}</TableCell>
+                            <TableCell className="font-medium">
+                              {entry.workerName}
+                            </TableCell>
                             <TableCell>
-                              <Badge variant="secondary">{entry.designation}</Badge>
+                              <Badge variant="secondary">
+                                {entry.designation}
+                              </Badge>
                             </TableCell>
                             <TableCell className="relative px-4" colSpan={2}>
                               <div className="grid grid-cols-2 place-items-center h-8">
-                                <span>{entry.isPresent ? ((entry.formulaX ?? Math.floor((entry.hoursWorked || 0) / 8)) || 0) : '-'}</span>
-                                <span>{entry.isPresent ? ((entry.formulaY ?? ((entry.hoursWorked || 0) % 8)) || 0) : '-'}</span>
+                                <span>
+                                  {entry.isPresent
+                                    ? (entry.formulaX ??
+                                        Math.floor(
+                                          (entry.hoursWorked || 0) / 8,
+                                        )) ||
+                                      0
+                                    : "-"}
+                                </span>
+                                <span>
+                                  {entry.isPresent
+                                    ? (entry.formulaY ??
+                                        (entry.hoursWorked || 0) % 8) ||
+                                      0
+                                    : "-"}
+                                </span>
                               </div>
-                              <span className="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center text-[14px] text-muted-foreground">P</span>
+                              <span className="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center text-[14px] text-muted-foreground">
+                                P
+                              </span>
                             </TableCell>
-                            <TableCell>{entry.isPresent ? ((((entry.formulaX ?? Math.floor((entry.hoursWorked || 0)/8)) || 0) * 8) + (((entry.formulaY ?? ((entry.hoursWorked || 0)%8)) || 0))) : '-'}</TableCell>
-                            <TableCell className="max-w-[200px] truncate">{entry.remarks || '-'}</TableCell>
+                            <TableCell>
+                              {entry.isPresent
+                                ? ((entry.formulaX ??
+                                    Math.floor((entry.hoursWorked || 0) / 8)) ||
+                                    0) *
+                                    8 +
+                                  ((entry.formulaY ??
+                                    (entry.hoursWorked || 0) % 8) ||
+                                    0)
+                                : "-"}
+                            </TableCell>
+                            <TableCell className="max-w-[200px] truncate">
+                              {entry.remarks || "-"}
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
