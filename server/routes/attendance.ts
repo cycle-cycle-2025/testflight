@@ -361,6 +361,43 @@ export const handleAdminApprove: RequestHandler = (req, res) => {
   }
 };
 
+export const handleAdminUpdateAttendance: RequestHandler = (req, res) => {
+  try {
+    const user = getUserFromToken(req.headers.authorization);
+    if (!user || user.role !== "admin") {
+      const response: ApiResponse = { success: false, message: "Unauthorized" };
+      return res.status(401).json(response);
+    }
+    const { id } = req.params as { id: string };
+    const record = database.attendanceRecords.find(r => r.id === id);
+    if (!record) {
+      const response: ApiResponse = { success: false, message: "Attendance record not found" };
+      return res.status(404).json(response);
+    }
+    const { entries, inTime, outTime, date } = req.body as Partial<AttendanceRecord> & { entries?: AttendanceEntry[] };
+    if (Array.isArray(entries)) {
+      record.entries = entries as any;
+      record.totalWorkers = entries.length;
+      record.presentWorkers = entries.filter(e => e.isPresent).length;
+    }
+    if (typeof inTime === 'string' || inTime === null) {
+      if (inTime === null) delete (record as any).inTime; else record.inTime = inTime;
+    }
+    if (typeof outTime === 'string' || outTime === null) {
+      if (outTime === null) delete (record as any).outTime; else record.outTime = outTime;
+    }
+    if (typeof date === 'string') {
+      record.date = date;
+    }
+    const response: ApiResponse<AttendanceRecord> = { success: true, data: record };
+    return res.json(response);
+  } catch (error) {
+    console.error('Admin update attendance error:', error);
+    const response: ApiResponse = { success: false, message: 'Internal server error' };
+    return res.status(500).json(response);
+  }
+};
+
 export const handleApprovedRecords: RequestHandler = (req, res) => {
   try {
     const user = getUserFromToken(req.headers.authorization);
